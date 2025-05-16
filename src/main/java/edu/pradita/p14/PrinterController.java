@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.sql.*;
 import java.util.List;
+import java.util.ArrayList;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -232,9 +233,7 @@ public class PrinterController {
     @FXML
     private void handlePrint() {
         try {
-            // Ambil data transaksi dari database
-            List<Transaction> transactions = ...; // ambil dari database
-
+            List<Transaction> transactions = new ArrayList<>(transactionTable.getItems());
             System.out.println("=== PRINTING TABLE TRANSACTIONS ===");
             for (Transaction t : transactions) {
                 System.out.println("Transaction ID: " + t.getTransactionId());
@@ -243,8 +242,6 @@ public class PrinterController {
                 System.out.println("Quantity: " + t.getQuantity());
                 System.out.println("Total Price: " + t.getTotalPrice());
                 System.out.println();
-
-                // Kirim notifikasi observer setiap transaksi diprint
                 notifier.notifyObservers(t);
             }
             statusLabel.setText("Status: Print Successful!");
