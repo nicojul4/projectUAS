@@ -73,6 +73,7 @@ public class PrinterController {
     private static final String DATA_FILE = "transactions.json";
     private final Gson gson = new Gson();
     private TransactionNotifier notifier = new TransactionNotifier();
+    private final DataProvider provider = new HibernateTransactionAdapter();
 
     @FXML
     public void initialize() {
@@ -81,7 +82,8 @@ public class PrinterController {
         colProduct.setCellValueFactory(new PropertyValueFactory<>("productId"));
         colQty.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         colTotal.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
-        transactionTable.setItems(filteredTransactions);
+        transactionTable.setItems(transactions);
+        refreshTable();
 
         transactionTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel != null) {
@@ -173,6 +175,10 @@ public class PrinterController {
         }
     }
 
+    private void refreshTable() {
+        transactions.setAll(provider.getAllTransactions());
+    }
+
     @FXML
     private void handleAddTransaction() {
         try {
@@ -180,9 +186,9 @@ public class PrinterController {
             int productId = Integer.parseInt(productIdField.getText());
             int quantity = Integer.parseInt(quantityField.getText());
             double totalPrice = Double.parseDouble(totalPriceField.getText());
-            Transaction t = new Transaction(nextId++, userId, productId, quantity, totalPrice);
-            transactions.add(t);
-            saveData();
+            Transaction t = new Transaction(0, userId, productId, quantity, totalPrice);
+            provider.saveTransaction(t);
+            refreshTable();
             clearFields();
             statusLabel.setText("Status: Transaction Added!");
         } catch (Exception e) {
@@ -199,8 +205,8 @@ public class PrinterController {
                 selected.setProductId(Integer.parseInt(productIdField.getText()));
                 selected.setQuantity(Integer.parseInt(quantityField.getText()));
                 selected.setTotalPrice(Double.parseDouble(totalPriceField.getText()));
-                transactionTable.refresh();
-                saveData();
+                provider.updateTransaction(selected);
+                refreshTable();
                 statusLabel.setText("Status: Transaction Updated!");
             } catch (Exception e) {
                 statusLabel.setText("Status: Invalid Input!");
@@ -214,8 +220,8 @@ public class PrinterController {
     private void handleDeleteTransaction() {
         Transaction selected = transactionTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            transactions.remove(selected);
-            saveData();
+            provider.deleteTransaction(selected);
+            refreshTable();
             clearFields();
             statusLabel.setText("Status: Transaction Deleted!");
         } else {

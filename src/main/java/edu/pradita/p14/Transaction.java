@@ -7,10 +7,19 @@ import jakarta.persistence.*;
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "transaction_id")
     private int transactionId;
+
+    @Column(name = "user_id")
     private int userId;
+
+    @Column(name = "product_id")
     private int productId;
+
+    @Column(name = "quantity")
     private int quantity;
+
+    @Column(name = "total_price")
     private double totalPrice;
 
     public Transaction() {}
