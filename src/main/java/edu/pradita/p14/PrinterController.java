@@ -82,8 +82,7 @@ public class PrinterController {
         colProduct.setCellValueFactory(new PropertyValueFactory<>("productId"));
         colQty.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         colTotal.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
-        transactionTable.setItems(transactions);
-        refreshTable();
+        transactionTable.setItems(filteredTransactions);
 
         transactionTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSel, newSel) -> {
             if (newSel != null) {
@@ -94,7 +93,6 @@ public class PrinterController {
             }
         });
 
-        // Search/filter logic
         if (searchField != null) {
             searchField.textProperty().addListener((obs, oldVal, newVal) -> {
                 String filter = newVal.trim();
